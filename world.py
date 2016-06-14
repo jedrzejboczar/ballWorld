@@ -12,22 +12,20 @@ class World(PygameHelper):
 		self.gravity = [0, -10]
 		self.last_gravity = self.gravity
 
-		self.y_max = 640
-
 	def mainLoop(self):
 		PygameHelper.mainLoop(self, 40)
 		# super(self.__class__, self).mainLoop(40)
 
 
 	def doPhysics(self):
-		for obj in self.objects:
-			pass
+		for o in self.objects:
+			o.move(self.size)
 
 	def update(self):
 		for o in self.objects:
 			o.fx, o.fy = self.gravity
-		for o in self.objects:
-			o.move(self.size)
+		self.doPhysics()
+		self.checkBallCollisions()
 
 
 	def draw(self):
@@ -35,10 +33,8 @@ class World(PygameHelper):
 		for o in self.objects:
 			o.draw(self.screen)
 		o1 = self.objects[0]
-		if o1.y < self.y_max:
-			self.y_max = o1.y
 		# o obiekcie nr 1
-		text = pygame.font.SysFont("serif", 15).render("y_max = (" + str(640 - self.y_max) + ")", True, BLACK)
+		text = pygame.font.SysFont("serif", 15).render(o1.name + ":", True, BLACK)
 		self.screen.blit(text, (20, 345))
 		text = pygame.font.SysFont("serif", 15).render("x = (" + str(o1.x) + ", " + str(o1.y) + ")", True, BLACK)
 		self.screen.blit(text, (20, 370))
@@ -63,8 +59,31 @@ class World(PygameHelper):
 			self.gravity[0] += 1
 			print "K_RIGHT"
 
+	def checkBallCollisions(self):
+		n = len(self.objects)
+		for i in range(n):
+			o1 = self.objects[i]
+			for j in range(n-i-1):
+				o2 = self.objects[i+j+1]
+				if distance((o1.x, o1.y), (o2.x, o2.y)) <= o1.radius + o2.radius:
+					self.countBallCollision(o1, o2)
+
+	def countBallCollision(self, o1, o2):
+		print "collision: ", o1.name, " - ", o2.name
+		# u - predkosci po zderzeniu
+		u1x = ((o1.m - o2.m)*o1.vx + 2*o2.m*o2.vx) / (o1.m + o2.m)
+		u1y = ((o1.m - o2.m)*o1.vy + 2*o2.m*o2.vy) / (o1.m + o2.m)
+		u2x = ((o2.m - o1.m)*o2.vx + 2*o1.m*o1.vx) / (o1.m + o2.m)
+		u2y = ((o2.m - o1.m)*o2.vy + 2*o1.m*o1.vy) / (o1.m + o2.m)
+		o1.vx = u1x
+		o1.vy = u1y
+		o2.vx = u2x
+		o2.vy = u2y
+
 
 if __name__ == '__main__':
-	o = Ball(mass=10, position=(140,180), velocity=(4.5, 0), force=(0, -10))
-	world = World([o])
+	o1 = Ball("red_ball", 18, (215, 20, 20), mass=20, position=(140,180), velocity=(4.5, 0), force=(0, -10))
+	o2 = Ball("green_ball", 21, (20, 215, 20), mass=30, position=(240,110), velocity=(-1.5, 0), force=(0, -10))
+	o3 = Ball("blue_ball", 13, (20, 20, 215), mass=10, position=(160,90), velocity=(7.5, 0), force=(0, -10))
+	world = World([o1, o2, o3])
 	world.mainLoop()
