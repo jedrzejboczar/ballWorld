@@ -2,18 +2,18 @@ import math
 import pygame
 
 class PhysicalObject(object):
-	def __init__(self, name, mass, position, velocity=(0, 0), force=(0, 0)):
+	def __init__(self, name, mass, position, velocity=(0, 0), force=(0, 0), friction=None):
 		self.name = name
-		self.m = mass
-		self.x, self.y = position	# (x,y)
-		self.vx, self.vy = velocity
-		self.fx, self.fy = force
+		self.m = float(mass)
+		self.x, self.y = [float(a) for a in position]	# (x,y)
+		self.vx, self.vy = [float(a) for a in velocity]
+		self.fx, self.fy = [float(a) for a in force]
+		self.friction = friction
 
-	def move(self, borders):
+	def move(self):
 		self.countPhysics()
 		self.x += self.vx
 		self.y -= self.vy	# WAZNE: bo na wyswietlaniu y jest odwrocony
-		self.checkBorderCollisions(borders)
 
 	def checkBorderCollisions(self, borders):
 		pass
@@ -23,41 +23,38 @@ class PhysicalObject(object):
 		self.ay = float(self.fy) / float(self.m)
 		self.vx += self.ax
 		self.vy += self.ay
+		if self.friction:
+			self.vx *= (1.0 - self.friction)
+			self.vy *= (1.0 - self.friction)
 
 	def draw(self):
 		pass
+
+	def xy(self):
+		return self.x, self.y
 
 
 
 class Ball(PhysicalObject):
 	def __init__(self, name, radius, color, mass, position, velocity=(0, 0), force=(0, 0)):
 		PhysicalObject.__init__(self, name, mass, position, velocity, force)
-		self.radius = radius
+		self.radius = float(radius)
 		self.color = color
 
 	def draw(self, paintScreen):
 		x, y = int(self.x), int(self.y)
-		pygame.draw.circle(paintScreen, self.color, (x, y), self.radius)
-
-	def checkBorderCollisions(self, borders):
-		if self.x - self.radius < 0: # lewa sciana
-			self.vx = abs(self.vx)
-			self.x = 0 + self.radius
-		elif self.x + self.radius > borders[0]: # prawa sciana
-			self.vx = -abs(self.vx)
-			self.x = borders[0] - self.radius
-		elif self.y - self.radius < 0: # gorna sciana
-			self.vy = -abs(self.vy)
-			self.y = 0 + self.radius
-		elif self.y + self.radius > borders[1]: # dolna sciana
-			self.vy = abs(self.vy)
-			self.y = borders[1] - self.radius
+		pygame.draw.circle(paintScreen, self.color, (x, y), int(self.radius))
 
 
 
-def distance((x1,y1), (x2, y2)):
+
+
+def distance((x1, y1), (x2, y2)):
 	d = math.sqrt((x1 - x2)**2 + (y1 - y2)**2)
 	return d
+
+def dot((x1, y1), (x2, y2)):
+	return x1*x2 + y1*y2
 
 if __name__ == '__main__':
 	pass
