@@ -19,8 +19,8 @@ class PhysicalObject(object):
 		pass
 
 	def countPhysics(self):
-		self.ax = self.fx / self.m
-		self.ay = self.fy / self.m
+		self.ax = float(self.fx) / float(self.m)
+		self.ay = float(self.fy) / float(self.m)
 		self.vx += self.ax
 		self.vy += self.ay
 
@@ -41,44 +41,29 @@ class Ball(PhysicalObject):
 
 	def checkCollisions(self, borders):
 		if self.x - self.radius < 0: # lewa sciana
-			if self.y - self.radius < 0: # lewy gorny rog
-				print "lewy gorny rog"
-				pass
-			elif self.y + self.radius > borders[1]: # lewy dolny rog
-				print "lewy dolny rog"
-				pass
-			else:	#lewa sciana
-				print "lewa sciana"
-				self.vx = abs(self.vx)
-				self.x = 0 + self.radius
-				# self.ax = abs(self.ax)
-				pass
+			print "lewa sciana"
+			self.vx = abs(self.vx)
+			self.x = 0 + self.radius
+			# self.ax = abs(self.ax)
+			pass
 		elif self.x + self.radius > borders[0]: # prawa sciana
-			if self.y - self.radius < 0: # prawy gorny rog
-				print "prawy gorny rog"
-				pass
-			elif self.y + self.radius > borders[1]: # prawy dolny rog
-				print "prawy dolny rog"
-				pass
-			else: # prawa sciana
-				print "prawa sciana"
-				self.vx = -abs(self.vx)
-				self.x = borders[0] - self.radius
-				# self.ax = -abs(self.ax)
-				pass
-		else: # zostaje przypadek gornej i dolnej sciany
-			if self.y - self.radius < 0: # gorna sciana
-				print "gorna sciana"
-				self.vy = -abs(self.vy)
-				self.y = 0 + self.radius
-				# self.ay = -abs(self.ay)
-				pass
-			elif self.y + self.radius > borders[1]: # dolna sciana
-				print "dolna sciana"
-				self.vy = abs(self.vy)
-				self.y = borders[1] - self.radius
-				# self.ay = abs(self.ay)
-				pass
+			print "prawa sciana"
+			self.vx = -abs(self.vx)
+			self.x = borders[0] - self.radius
+			# self.ax = -abs(self.ax)
+			pass
+		elif self.y - self.radius < 0: # gorna sciana
+			print "gorna sciana"
+			self.vy = -abs(self.vy)
+			self.y = 0 + self.radius
+			# self.ay = -abs(self.ay)
+			pass
+		elif self.y + self.radius > borders[1]: # dolna sciana
+			print "dolna sciana"
+			self.vy = abs(self.vy)
+			self.y = borders[1] - self.radius
+			# self.ay = abs(self.ay)
+			pass
 
 
 

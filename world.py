@@ -9,6 +9,8 @@ class World(PygameHelper):
 		PygameHelper.__init__(self, (640, 480), WHITE)
 		# super(self.__class__, self).__init__()
 		self.objects = objects
+		self.gravity = [0, -10]
+		self.last_gravity = self.gravity
 
 		self.y_max = 640
 
@@ -23,7 +25,10 @@ class World(PygameHelper):
 
 	def update(self):
 		for o in self.objects:
+			o.fx, o.fy = self.gravity
+		for o in self.objects:
 			o.move(self.size)
+
 
 	def draw(self):
 		self.screen.fill(WHITE)
@@ -32,6 +37,7 @@ class World(PygameHelper):
 		o1 = self.objects[0]
 		if o1.y < self.y_max:
 			self.y_max = o1.y
+		# o obiekcie nr 1
 		text = pygame.font.SysFont("serif", 15).render("y_max = (" + str(640 - self.y_max) + ")", True, BLACK)
 		self.screen.blit(text, (20, 345))
 		text = pygame.font.SysFont("serif", 15).render("x = (" + str(o1.x) + ", " + str(o1.y) + ")", True, BLACK)
@@ -43,9 +49,22 @@ class World(PygameHelper):
 		text = pygame.font.SysFont("serif", 15).render("F = (" + str(o1.fx) + ", " + str(o1.fy) + ")", True, BLACK)
 		self.screen.blit(text, (20, 445))
 
+	def keyDown(self, key):
+		if key == pygame.K_UP:
+			self.gravity[1] += 1
+			print "K_UP"
+		elif key == pygame.K_DOWN:
+			self.gravity[1] -= 1
+			print "K_DOWN"
+		elif key == pygame.K_LEFT:
+			self.gravity[0] -= 1
+			print "K_LEFT"
+		elif key == pygame.K_RIGHT:
+			self.gravity[0] += 1
+			print "K_RIGHT"
 
 
 if __name__ == '__main__':
-	o = Ball(mass=20, position=(140,180), velocity=(4.5, 0), force=(0, -10))
+	o = Ball(mass=10, position=(140,180), velocity=(4.5, 0), force=(0, -10))
 	world = World([o])
 	world.mainLoop()
