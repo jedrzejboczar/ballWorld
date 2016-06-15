@@ -33,7 +33,7 @@ class BallWorld(PygameHelper):
 				o.fx, o.fy = self.gravity
 			self.doPhysics()
 
-		time.sleep(0.1)
+		# time.sleep(0.1)
 
 
 	def draw(self):
@@ -128,43 +128,42 @@ class BallWorld(PygameHelper):
 		cos_alfa = dy / dist
 
 		# predkosci w nowym ukl wspl
-		w1x = o1.vx * cos_alfa + o1.vy * sin_alfa # o1.vx * cos_alfa - o1.vy * sin_alfa
+		w1x = o1.vx * cos_alfa - o1.vy * sin_alfa
 		w1y = o1.vx * sin_alfa + o1.vy * cos_alfa
-		w2x = o2.vx * cos_alfa + o2.vy * sin_alfa # o2.vx * cos_alfa - o2.vy * sin_alfa
+		w2x = o2.vx * cos_alfa - o2.vy * sin_alfa
 		w2y = o2.vx * sin_alfa + o2.vy * cos_alfa
-		print "{} = {} * {} + {} * {}".format(w1x, o1.vx, cos_alfa, o1.vy, sin_alfa)
-		print "{} = {} * {} + {} * {}".format(w1y, o1.vx, sin_alfa, o1.vy, cos_alfa)
-		print "{} = {} * {} + {} * {}".format(w2x, o2.vx, cos_alfa, o2.vy, sin_alfa)
-		print "{} = {} * {} + {} * {}".format(w2y, o2.vx, sin_alfa, o2.vy, cos_alfa)
-		print w1x, w1y, w2x, w2y
+		# print "{} = {} * {} + {} * {}".format(w1x, o1.vx, cos_alfa, o1.vy, sin_alfa)
+		# print "{} = {} * {} + {} * {}".format(w1y, o1.vx, sin_alfa, o1.vy, cos_alfa)
+		# print "{} = {} * {} + {} * {}".format(w2x, o2.vx, cos_alfa, o2.vy, sin_alfa)
+		# print "{} = {} * {} + {} * {}".format(w2y, o2.vx, sin_alfa, o2.vy, cos_alfa)
+		# print w1x, w1y, w2x, w2y
 
 		# w nowym ukladzie zderzenie odbywa sie tylko w jednym wymiarze
 		# wiec wy nie zmieniaja sie
-		# u1x = ((o1.m - o2.m)*w1x + 2*o2.m*w2x) / (o1.m + o2.m)
-		# u2x = ((o2.m - o1.m)*w2x + 2*o1.m*w1x) / (o1.m + o2.m)
-		# u1y = w1y
-		# u2y = w2y
+		u1x = ((o1.m - o2.m)*w1x + 2*o2.m*w2x) / (o1.m + o2.m)
+		u2x = ((o2.m - o1.m)*w2x + 2*o1.m*w1x) / (o1.m + o2.m)
+		u1y = w1y
+		u2y = w2y
 
 		# u1x = w1x
 		# u2x = w2x
 		# u1y = ((o1.m - o2.m)*w1y + 2*o2.m*w2y) / (o1.m + o2.m)
 		# u2y = ((o2.m - o1.m)*w2y + 2*o1.m*w1y) / (o1.m + o2.m)
 
+		# u1x = -w1x
+		# u2x = -w2x
+		# u1y = w1y
+		# u2y = w2y
 
-		u1x = -w1x
-		u2x = -w2x
-		u1y = w1y
-		u2y = w2y
-
-		print u1x, u1y, u2x, u2y
+		# print u1x, u1y, u2x, u2y
 
 		# powrot do poprzedniego ukladu
 		o1.vx = u1x * cos_alfa + u1y * sin_alfa
-		o1.vy = u1x * sin_alfa + u1y * cos_alfa # - u1x * sin_alfa + u1y * cos_alfa
+		o1.vy = - u1x * sin_alfa + u1y * cos_alfa
 		o2.vx = u2x * cos_alfa + u2y * sin_alfa
-		o2.vy = u2x * sin_alfa + u2y * cos_alfa # - u2x * sin_alfa + u2y * cos_alfa
+		o2.vy = - u2x * sin_alfa + u2y * cos_alfa
 
-		print o1.vx, o1.vy, o2.vx, o2.vy
+		# print o1.vx, o1.vy, o2.vx, o2.vy
 
 
 	def countBallCollision(self, o1, o2):
@@ -174,7 +173,7 @@ class BallWorld(PygameHelper):
 		dx = o1.x - o2.x
 		dy = o1.y - o2.y
 
-		if dist < min(o1.radius, o2.radius):
+		if dist < min(o1.radius, o2.radius) / 8:
 			return	# jak kulka wewnatrz drugiej to niech juz nie liczy kolizji
 
 		# if is_almost_zero(dx) or is_almost_zero(dy):
