@@ -32,7 +32,7 @@ class BallWorld(PygameHelper):
 			for o in self.objects:
 				o.fx, o.fy = self.gravity
 			self.doPhysics()
-
+		# # spowolnienie czasu
 		# time.sleep(0.1)
 
 
@@ -40,8 +40,11 @@ class BallWorld(PygameHelper):
 		self.screen.fill(WHITE)
 		for o in self.objects:
 			o.draw(self.screen)
-		o1 = self.objects[0]
+
 		# o obiekcie nr 1
+		if len(self.objects) == 0:
+			return
+		o1 = self.objects[0]
 		sum_m = 0
 		sum_ek = 0
 		for o in objects:
@@ -77,11 +80,17 @@ class BallWorld(PygameHelper):
 			print "K_RIGHT"
 		elif key == pygame.K_SPACE:
 			if self.time:
-				self.time = False
-				print "TIME: STOP"
+				self.stopTime()
 			else:
-				self.time = True
-				print "TIME: START"
+				self.startTime()
+
+	def stopTime(self):
+		self.time = False
+		print "TIME: STOP"
+
+	def startTime(self):
+		self.time = True
+		print "TIME: START"
 
 	def checkBorderCollisions(self):
 		for o in self.objects:
@@ -103,7 +112,7 @@ class BallWorld(PygameHelper):
 		for i, o1 in enumerate(self.objects):
 			for o2 in self.objects[(i+1):]:
 				if distance(o1.xy(), o2.xy()) <= o1.radius + o2.radius:
-					# self.time = False
+					# self.stopTime()
 					self.countBallCollision(o1, o2)
 
 	def countBallCollision_easy(self, o1, o2):	# STABILNE, ale troche bledne
@@ -173,18 +182,66 @@ class BallWorld(PygameHelper):
 		dx = o1.x - o2.x
 		dy = o1.y - o2.y
 
-		if dist < min(o1.radius, o2.radius) / 8:
-			return	# jak kulka wewnatrz drugiej to niech juz nie liczy kolizji
+		if dist < min(o1.radius, o2.radius) / 16:
+			return	# jakby byly niemal na sobie to niech nie liczy, bo bedzie dzielenie przez 0
+
+
+
+
+		#
+		# # cofniecie kul do punktu styku
+		# #	At^2 + Bt + C = 0,	D = r1 + r2
+		# D = o1.radius + o2.radius
+		#
+		# # A = o1.vx**2 + o2.vx**2 - 2*o1.vx*o2.vx + o1.vy**2 + o2.vy**2 - 2*o1.vy*o2.vy
+		# # B = -2 * (o1.x*o1.vx - o1.x*o2.vx - o2.x*o1.vx + o2.x*o2.vx + o1.y*o1.vy - o1.y*o2.vy - o2.y*o1.vy + o2.y*o2.vy)
+		# # C = o1.x**2 + o2.x**2 - 2*o1.x*o2.x + o1.y**2 + o2.y**2 - 2*o1.y*o2.y - D**2
+		#
+		# A = o1.vx**2 + o2.vx**2 - 2*o1.vx*o2.vx + o1.vy**2 + o2.vy**2 - 2*o1.vy*o2.vy
+		# B = -2 * (o1.x*o1.vx - o1.x*o2.vx - o2.x*o1.vx + o2.x*o2.vx + o1.y*o1.vy - o1.y*o2.vy - o2.y*o1.vy + o2.y*o2.vy)
+		# C = o1.x**2 + o2.x**2 - 2*o1.x*o2.x + o1.y**2 + o2.y**2 - 2*o1.y*o2.y - D**2
+		#
+		#
+		#
+		# delta = B**2 - 4*A*C
+		# sqrt_delta = math.sqrt(delta)
+		#
+		# t1 = (-B + sqrt_delta) / (2*A)
+		# t2 = (-B - sqrt_delta) / (2*A)
+		#
+		# # t = max(t1, t2	)
+		# t = t1
+		# # o1.move(t)
+		# # o2.move(t)
+		# dx1 = -t * o1.vx
+		# dy1 = -t * o1.vy
+		# dx2 = -t * o2.vx
+		# dy2 = -t * o2.vy
+		# print "d1: {}, {}\nd2 = {}, {}".format(dx1,dy1,dx2,dy2)
+		#
+		# o1.x += dx1
+		# o1.y += dy1
+		# o2.x += dx2
+		# o2.y += dy2
+		#
+		# print "d = {}, r1+r2 = {}".format(distance(o1.xy(), o2.xy()), o1.radius + o2.radius)
+		#
+		# self.stopTime()
+		# time.sleep(0.5)
+		# self.draw()
+		# time.sleep(0.5)
+
+
+
+
+
 
 		# if is_almost_zero(dx) or is_almost_zero(dy):
 		# 	self.countBallCollision_easy(o1, o2)
 		# else:
 		# 	self.countBallCollision_hard(o1, o2)
 
-		if False:
-			self.countBallCollision_easy(o1, o2)
-		else:
-			self.countBallCollision_hard(o1, o2)
+		self.countBallCollision_hard(o1, o2)
 
 		# odsuniecie od siebie kul
 		o1.move()
@@ -215,8 +272,8 @@ if __name__ == '__main__':
 	# r = 31; objects.append(Ball("black_ball", r, (50, 50, 50), mass=_mass(r), position=(460,320), velocity=(7.5, 0.0)))
 	# r = 37; objects.append(Ball("brown_ball", r, (170, 80, 0), mass=_mass(r), position=(190,360), velocity=(7.5, 0.0)))
 
-	r = 31; objects.append(Ball("black_ball", r, (50, 50, 50), mass=_mass(r), position=(460,330), velocity=(-7.5, 0)))
-	r = 31; objects.append(Ball("brown_ball", r, (170, 80, 0), mass=_mass(r), position=(190,310), velocity=(0, 0)))
+	r = 31; objects.append(Ball("black_ball", r, (50, 50, 50), mass=_mass(r), position=(70,70), velocity=(7.5, -7.5), drawVelocity=True))
+	r = 31; objects.append(Ball("brown_ball", r, (170, 80, 0), mass=_mass(r), position=(180,235), velocity=(0, 0), drawVelocity=True))
 
 
 	world = BallWorld(objects, gravity)

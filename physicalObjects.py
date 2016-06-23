@@ -2,18 +2,19 @@ import math
 import pygame
 
 class PhysicalObject(object):
-	def __init__(self, name, mass, position, velocity=(0, 0), force=(0, 0), friction=None):
+	def __init__(self, name, mass, position, velocity=(0, 0), force=(0, 0), friction=None, drawVelocity=False):
 		self.name = name
 		self.m = float(mass)
 		self.x, self.y = [float(a) for a in position]	# (x,y)
 		self.vx, self.vy = [float(a) for a in velocity]
 		self.fx, self.fy = [float(a) for a in force]
 		self.friction = friction
+		self.drawVelocity = drawVelocity
 
-	def move(self):
+	def move(self, time=1):
 		self.countPhysics()
-		self.x += self.vx
-		self.y -= self.vy	# WAZNE: bo na wyswietlaniu y jest odwrocony
+		self.x += 0.3 * time * self.vx
+		self.y -= 0.3 * time * self.vy	# WAZNE: bo na wyswietlaniu y jest odwrocony
 
 	def checkBorderCollisions(self, borders):
 		pass
@@ -27,23 +28,42 @@ class PhysicalObject(object):
 			self.vx *= (1.0 - self.friction)
 			self.vy *= (1.0 - self.friction)
 
-	def draw(self):
-		pass
+	def draw(self, screen):
+		if self.drawVelocity:
+			self.drawVeclocityVector(screen)
 
 	def xy(self):
 		return self.x, self.y
 
+	def drawVeclocityVector(self, screen):
+		A = 0.2
+		start = (self.x, self.y)
+		end = (self.x + 10*self.vx, self.y - 10*self.vy)
+		points = [start, end]
+		pygame.draw.lines(screen, (255, 0, 0), False, points, 2)
+
+		fi = math.pi / 6
+		xl = end[0] + A * ((start[0] - end[0]) * math.cos(fi) + (start[1] - end[1]) * math.sin(fi))
+		yl = end[1] + A * ((start[1] - end[1]) * math.cos(fi) - (start[0] - end[0]) * math.sin(fi))
+		xp = end[0] + A * ((start[0] - end[0]) * math.cos(fi) - (start[1] - end[1]) * math.sin(fi))
+		yp = end[1] + A * ((start[1] - end[1]) * math.cos(fi) + (start[0] - end[0]) * math.sin(fi))
+		left = (xl, yl)
+		right = (xp, yp)
+		points = [end, left, right]
+		pygame.draw.polygon(screen, (255, 0, 0), points)
+
 
 
 class Ball(PhysicalObject):
-	def __init__(self, name, radius, color, mass, position, velocity=(0, 0), force=(0, 0)):
-		PhysicalObject.__init__(self, name, mass, position, velocity, force)
+	def __init__(self, name, radius, color, mass, position, velocity=(0, 0), force=(0, 0), friction=None, drawVelocity=False):
+		PhysicalObject.__init__(self, name, mass, position, velocity, force, friction, drawVelocity)
 		self.radius = float(radius)
 		self.color = color
 
-	def draw(self, paintScreen):
+	def draw(self, screen):
 		x, y = int(self.x), int(self.y)
-		pygame.draw.circle(paintScreen, self.color, (x, y), int(self.radius))
+		pygame.draw.circle(screen, self.color, (x, y), int(self.radius))
+		PhysicalObject.draw(self, screen)
 
 
 
