@@ -16,8 +16,8 @@ class PhysicalObject(object):
 	# (chociaz teoretycznie mozna poruszyc o czas ciagly, np przy wyliczani punktu zderzenia)
 	def move(self, frames=1):
 		self.countPhysics()
-		self.x += time * self.vx
-		self.y -= time * self.vy	# WAZNE: bo na wyswietlaniu y jest odwrocony
+		self.x += frames * self.vx
+		self.y -= frames * self.vy	# WAZNE: bo na wyswietlaniu y jest odwrocony
 
 	def countPhysics(self):
 		self.ax = float(self.fx) / float(self.m)
