@@ -1,6 +1,7 @@
 import math
 import pygame
 
+# TROCHE NA WYROST - na razie i tak tylko kule
 class PhysicalObject(object):
 	def __init__(self, name, mass, position, velocity=(0, 0), force=(0, 0), friction=None, drawVelocity=False):
 		self.name = name
@@ -11,13 +12,12 @@ class PhysicalObject(object):
 		self.friction = friction
 		self.drawVelocity = drawVelocity
 
-	def move(self, time=1):
+	# Czas jest dyskretny, wiec odliczany w klatkach
+	# (chociaz teoretycznie mozna poruszyc o czas ciagly, np przy wyliczani punktu zderzenia)
+	def move(self, frames=1):
 		self.countPhysics()
-		self.x += 0.3 * time * self.vx
-		self.y -= 0.3 * time * self.vy	# WAZNE: bo na wyswietlaniu y jest odwrocony
-
-	def checkBorderCollisions(self, borders):
-		pass
+		self.x += time * self.vx
+		self.y -= time * self.vy	# WAZNE: bo na wyswietlaniu y jest odwrocony
 
 	def countPhysics(self):
 		self.ax = float(self.fx) / float(self.m)
@@ -28,6 +28,7 @@ class PhysicalObject(object):
 			self.vx *= (1.0 - self.friction)
 			self.vy *= (1.0 - self.friction)
 
+	# PhysicalObject moze rysowac tylko wektor predkosci, wyglad zalezy od podklasy
 	def draw(self, screen):
 		if self.drawVelocity:
 			self.drawVeclocityVector(screen)
